@@ -1,5 +1,6 @@
 # other
 board.html
+creds.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -67,6 +68,7 @@ db.sqlite3-journal
 # Flask stuff:
 instance/
 .webassets-cache
+.flaskenv
 
 # Scrapy stuff:
 .scrapy
