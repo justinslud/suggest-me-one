@@ -3,3 +3,4 @@ requests
 SPARQLWrapper
 flask-WTF
 wikipedia
+gunicorn

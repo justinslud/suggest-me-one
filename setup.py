@@ -10,6 +10,8 @@ setup(
         'flask',
         'requests',
         'SPARQLWrapper',
-        'flask-wtf'
+        'flask-WTF',
+        'wikipedia',
+        'gunicorn'
     ],
 )
