@@ -1,0 +1,5 @@
+flask
+requests
+SPARQLWrapper
+flask-WTF
+wikipedia
