@@ -1,0 +1,91 @@
+<html>
+    <br>
+    <head>
+        <title>Suggest Me One</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+</head>
+    </head>
+    <body>
+        {% with messages = get_flashed_messages() %}
+   {% if messages %}
+      {% for message in messages %}
+         {{ message }}
+      {% endfor %}
+   {% endif %}
+{% endwith %}
+        <div class="container">
+            <h1>Suggest Me One</h1>
+
+            <br>
+        <div class="row">
+        <div class="col-sm-6">
+            <form action='http://localhost:5000/suggest', method="get">
+            <fieldset>
+                <div class="form-group">
+
+                    <label for="category">Category:</label>
+                    <input type="text" class="form-control" id="category" name="category" placeholder="What do you want me to suggest?">
+                    <br>
+
+                    <a href="#demo" class="btn btn-submit" data-toggle="collapse">View Optional Inputs</a>
+                    <div id="demo" class="collapse">
+                        <br>
+                        <label for="similar">Similar:</label>
+                        <input type="text" class="form-control" id="similar" name="similar" placeholder="Enter a similar book">
+                        <br>
+                        <label for="start">From:</label>
+                        {{ form.start(class_="form-control") }}
+                        <br>
+                        <label for="end">To:</label>
+                        {{ form.end(class_="form-control", value=2020) }}
+                        <br>
+                        {{ form.genre(class_="form-control") }}
+                        
+                    </div>
+
+                    <br>
+
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    {{ form.csrf_token }}
+                    
+                </div>
+
+                </fieldset>
+            </form>
+        </div>
+        <div class="col-sm-6">    
+            <br>
+
+            {% if suggestion %}
+            <div class="container">
+                <div class="jumbotron">
+                    <h2>Suggestion:</h2>
+
+                    <a href={{ suggestion[2] }}><p>{{ suggestion[0] }}</p></a>
+                    <p>Author: {{ suggestion[1] }}</p>
+                </div>
+            </div>
+
+            {% endif %}
+
+            {% if previous|length > 1 %}
+            <h2>Previous Suggestions:</h2>
+
+            <ul>
+                {% for query in previous[:-1] %}
+                    {% if query %}
+                    <li>{{ query[0] }} : <a href={{ query[2] }}>{{ query[1] }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+    </body>
+
+</html>
