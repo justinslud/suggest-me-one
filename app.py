@@ -1,8 +1,6 @@
 from flask import Flask, flash, redirect, url_for, render_template, request
 from wtforms import Form, TextField, SelectField, SubmitField, validators, ValidationError
 from flask_wtf import FlaskForm
-# import random
-# import time
 from utils import build_query, execute_query
 import creds
 
@@ -10,7 +8,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = creds.SECRET_KEY
 
 previous = []
-# options = {'book': ['alice', 'night'], 'show': ['saul', 'game of thrones']}
 genres = ['literaryFiction']
 
 class SuggestForm(FlaskForm):
@@ -40,8 +37,8 @@ def index():
 @app.route("/suggest/", methods=['GET'])
 def suggest():
     form = SuggestForm(request.form)
-
-    if form.validate_on_submit():
+    if True:
+    # if form.validate_on_submit():
     # category = form['category'].data.lower()
     # change hardcoded value back
     # genre = form.get('genre')
@@ -73,9 +70,9 @@ def suggest():
 
         return render_template('index.html', form=form, suggestion=suggestion, previous=previous)
 
-    else:
-        flash(form.errors)
-        flash(form.validate_on_submit())
-        return render_template('index.html', form=form)
+    # else:
+    #     # flash(form.errors)
+    #     # flash(form.validate_on_submit())
+    #     return render_template('index.html', form=form)
 if __name__ == '__main__':
     app.run(debug=True)
