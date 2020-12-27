@@ -1,8 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 import wikipedia
-import json
+# import JSON
 import pdb
-from functools import lru_cache
 # pdb.set_trace()
 sparql = SPARQLWrapper('http://dbpedia.org/sparql')
 sparql.setReturnFormat(JSON)
@@ -14,10 +13,9 @@ def get_similar_page_name(similar):
     #         return str(result)
     return str(results[0])
 
-@lru_cache(maxsize=10)
-def build_query(category='book', similar=None, genre=None, start=None, end=None):
+def build_query(category='book', similar=None, genre=None, subject=None, start=None, end=None):
     # don't necessary want disticnt author
-    query = 'SELECT DISTINCT ?title ?author ?isbn WHERE { '
+    query = 'SELECT DISTINCT ?title ?abstract ?author ?isbn WHERE { '
 
     if similar:
         similar_page_name = get_similar_page_name(similar)
@@ -25,47 +23,51 @@ def build_query(category='book', similar=None, genre=None, start=None, end=None)
             query += '?similar rdfs:label "{}"@en .\n'.format(similar_page_name)
             query += '?similar dbo:literaryGenre ?genre .\
                   ?res dbo:literaryGenre ?genre .\n'
-    # don't want conflicting genres. prioritize inputted but then how do you connect with similar?
-    # if genre:
-    #     query += '?similar dbo:literaryGenre ?genre .\
-    #               ?res dbo:literaryGenre ?genre .\n'
+        elif genre:
+            query += '?similar dbo:literaryGenre ?genre .\
+                  ?res dbo:literaryGenre ?genre .\n'
+
+        else:
+            query += '?res rdfs:label "{}"@en .\n'.format(category)
+
+    if subject:
+        query += '?res dbo:subject "{}" .\n'.format(subject)
 
     query += '?res dbo:isbn ?isbn .\
                 ?res rdfs:label ?title .\
+                ?res dbo:abstract ?abstract .\
                 ?res dbo:author ?author_ .\
-                ?author_ rdfs:label ?author .}\n'
+                ?author_ rdfs:label ?author .\n'
 
-    # if start:
-    #     query += 'FILTER(?year[] > {}) .\n'.format(start)
+    if start:
+        query += '?res dbo:publicationDate ?date. \
+                    FILTER(YEAR(?date) > {}) .\n'.format(start)
+        
+        if end:
+            query += 'FILTER(YEAR(?date) < {}) .\n'.format(end)
 
-    # if end:
-    #     query += 'FILTER(?year[] , {}) .}\n'.format(end)
+    elif end:
+        query += '?res dbo:publicationDate ?date. \
+                    FILTER(YEAR(?date) < {}) .\n'.format(end)
 
-    query += 'LIMIT 10'
+    query += '} LIMIT 10'
 
     sparql.setQuery(query)
     return query
 
-@lru_cache(maxsize=10)
 def execute_query(query):
     try:
         results = sparql.query().convert()
 
     except Exception as e:
         print(e)
-        return 'Suggestion could not be gathered at this time'
+        return [['Suggestion could not be gathered at this time']]
 
-    # if len(..) == 0:
-    #   print('no results')
-    #   return 'No matches found. Try broadening your criteria or removing then entirely'
-    # try:
-    #     print(json.loads(results))
-    # except:
-    #     pass
     rows = results["results"]["bindings"]
     values = []
-    # don't need to do this for all rows since only suggest one, would require generator
-    for row in rows: # need to fix author error
-        values.append([row['title']['value'], 'author_name', row['isbn']['value']])
+    for row in rows:
+        values.append([row['title']['value'], row['author']['value'], row['isbn']['value'], row['abstract']['value']])
 
     return values
+
+# def format_results()
