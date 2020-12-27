@@ -17,33 +17,48 @@
       {% endfor %}
    {% endif %}
 {% endwith %}
+
+<!--         {% if suggestion %}
+            {{ suggestion }}
+            {% set path='' %}
+            }
+        {% else %}
+            {% set path='./suggest/' %}
+        {% endif %} -->
+
         <div class="container">
-            <h1>Suggest Me One</h1>
+            <a href="/"><h1>Suggest Me One</h1></a>
 
             <br>
         <div class="row">
         <div class="col-sm-6">
-            <form action='http://localhost:5000/suggest', method="get">
+            <form action='./suggest/', method="get">
             <fieldset>
                 <div class="form-group">
 
                     <label for="category">Category:</label>
                     <input type="text" class="form-control" id="category" name="category" placeholder="What do you want me to suggest?">
                     <br>
-
-                    <a href="#demo" class="btn btn-submit" data-toggle="collapse">View Optional Inputs</a>
+                    <div>
+                        <a href="#demo" class="btn btn-submit" data-toggle="collapse">View Optional Inputs</a>
+                    </div>
                     <div id="demo" class="collapse">
                         <br>
                         <label for="similar">Similar:</label>
-                        <input type="text" class="form-control" id="similar" name="similar" placeholder="Enter a similar book">
+                        <input type="text" class="form-control" id="similar" name="similar" placeholder="Enter a similar book title">
+                        <br>
+                        <label for="genre">Genre:</label>
+                        {{ form.genre(class_="form-control") }}
+                        <br>
+                        <label for="subject">Subject:</label>
+                        {{ form.subject(class_="form-control") }}
                         <br>
                         <label for="start">From:</label>
                         {{ form.start(class_="form-control") }}
                         <br>
                         <label for="end">To:</label>
                         {{ form.end(class_="form-control", value=2020) }}
-                        <br>
-                        {{ form.genre(class_="form-control") }}
+
                         
                     </div>
 
@@ -61,14 +76,22 @@
             <br>
 
             {% if suggestion %}
-            <div class="container">
                 <div class="jumbotron">
+                {% if suggestion|length == 1 %}
+                    <p>{{ suggestion[0] }}
+
+                {% else %}
                     <h2>Suggestion:</h2>
 
                     <a href={{ suggestion[2] }}><p>{{ suggestion[0] }}</p></a>
                     <p>Author: {{ suggestion[1] }}</p>
+
+                    <div>
+                        <h4>Abstract</h4>
+                        <p>{{ suggestion[3] }}</p>
+                    </div>
+                {% endif %}
                 </div>
-            </div>
 
             {% endif %}
 
@@ -79,6 +102,7 @@
                 {% for query in previous[:-1] %}
                     {% if query %}
                     <li>{{ query[0] }} : <a href={{ query[2] }}>{{ query[1] }}</a></li>
+
                     {% endif %}
                 {% endfor %}
             </ul>
@@ -87,5 +111,17 @@
     </div>
 </div>
     </body>
+
+    <footer>
+        <div class="container">
+            <div class='row'>
+                <div class='col-sm-6'>
+            <a href="https://justinslud.github.io">Justin Slud</a>
+            <br>
+            <a href="https://github.com/justinslud">View Source</a>
+        </div>
+        </div>
+        </div>
+    </footer>
 
 </html>
