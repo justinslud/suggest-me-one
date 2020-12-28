@@ -15,7 +15,7 @@ def get_similar_page_name(similar):
 
 def build_query(category='book', similar=None, genre=None, subject=None, start=None, end=None):
     # don't necessary want disticnt author
-    query = 'SELECT DISTINCT ?title ?abstract ?author ?isbn WHERE { '
+    query = 'SELECT DISTINCT ?title ?abstract ?author ?isbn ?link WHERE { '
 
     if similar:
         similar_page_name = get_similar_page_name(similar)
@@ -30,27 +30,34 @@ def build_query(category='book', similar=None, genre=None, subject=None, start=N
         else:
             query += '?res rdfs:label "{}"@en .\n'.format(category)
 
+    if genre:
+            query += '?res dbo:literaryGenre ?genre .\
+                  ?genre rdfs:label "{}"@en .\n'.format(genre)
+
     if subject:
-        query += '?res dbo:subject "{}" .\n'.format(subject)
+        query += '?res  dbo:subject ?subject .\
+            ?subject rdfs:label "{}" .\n'.format(subject)
 
     query += '?res dbo:isbn ?isbn .\
                 ?res rdfs:label ?title .\
                 ?res dbo:abstract ?abstract .\
                 ?res dbo:author ?author_ .\
-                ?author_ rdfs:label ?author .\n'
+                ?author_ rdfs:label ?author .\
+                ?res prov:wasDerivedFrom ?link .\n'
 
-    if start:
-        query += '?res dbo:publicationDate ?date. \
-                    FILTER(YEAR(?date) > {}) .\n'.format(start)
+    # if start:
+    #     query += '?res dbo:publicationDate ?date. \
+    #                 FILTER(YEAR(?date) > {}) .\n'.format(start)
         
-        if end:
-            query += 'FILTER(YEAR(?date) < {}) .\n'.format(end)
+    #     if end:
+    #         query += 'FILTER(YEAR(?date) < {}) .\n'.format(end)
 
-    elif end:
-        query += '?res dbo:publicationDate ?date. \
-                    FILTER(YEAR(?date) < {}) .\n'.format(end)
+    # elif end:
+    #     query += '?res dbo:publicationDate ?date. \
+    #                 FILTER(YEAR(?date) < {}) .\n'.format(end)
 
-    query += '} LIMIT 10'
+    query += 'FILTER(lang(?author) = "en") .\
+        FILTER(lang(?title) = "en") } LIMIT 10'
 
     sparql.setQuery(query)
     return query
@@ -61,8 +68,7 @@ def execute_query(query):
 
     except Exception as e:
         print(e)
-        return [['Suggestion could not be gathered at this time']]
-
+        return None
     rows = results["results"]["bindings"]
     values = []
     for row in rows:
